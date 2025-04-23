@@ -1,0 +1,63 @@
+https://dev.mysql.com/downloads/mysql/ > 8.4.5 LTS
+
+https://dev.mysql.com/downloads/workbench/ > 8.0.42
+
+C:\Program Files\MySQL\MySQL Server 8.4\bin > cmd
+
+(en el cmd)
+.\mysql -u root -p -P 3307 	(-p para que pida pass, -P porque le hemos cambiado el puerto)
+
+SHOW DATABASES; #(para que muestre las bases de datos existentes, windows no detecta mayus pero mejor MAYUS)
+			cuando creamos BD podemos elegir si es case sensitive o no
+
+SHOW TABLES; #muestra tablas
+
+SELECT * FROM country;	#selecciona todo(*) de la tabla COUNTRY
+
+CREATE DATABASE IF NOT EXISTS biblioteca; # crea una base de datos llamada biblioteca, hay que refrescar para que aparezca en el menu
+		(si no existe, así no da error, IF EXISTS para si existe)
+
+DROP DATABASE biblioteca; #elimina la base de datos llamada biblioteca
+
+el script se ejecuta en orden, si alguna linea da error para de ejecutar
+
+CREATE TABLE IF NOT EXISTS libros(
+id_libro int AUTO_INCREMENT NOT NULL PRIMARY KEY
+titulo_libro VARCHAR(100) NOT NULL,
+id_autor INT NOT NULL,
+editorial varchar(50) not null,
+ejemplares_stock smallint -- ,
+-- PRIMARY KEY (id_libro) en vez de ponerlo arriba
+);
+
+INSERT
+*****************************
+workbench - cliente mysql
+
+edit>preferences: 
+		SQL editor: safe update - desmarcar
+		query editor: use UPPERCASE - marcar
+
+#triggers se ejecutan automáticamente cuando se produzca un evento de la BD.
+
+COMENTARIOS:
+	# no recomendado (da problemas al hacer funciones)
+	-- recomendado
+	/*para multiples lineas*/
+
+EER - Esquema Entidad Relacion
+
+	para pasar de una tabla a otra hay relaciones, campos que estan en una tabla y otra 
+
+PK - Primary Key, llave principal, única y no nula
+NN - Not null
+UQ - Unique
+B - Binary
+UN - Unsigned, para valores de tipo INT, si queremos que puedan tener signo o no
+ZF - 
+AI - Auto Incremental, cada vez que se añade un item se autoincrementa y se asigna (sigue contando aunque se hayan borrado items desde el ultimo incremento)
+
+Datatype
+ENUM - lista de valores posibles (aceptados)
+
+CRUD - Create(Instert) Read(Select) Update Delete(Drop)
