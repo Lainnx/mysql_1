@@ -74,3 +74,7 @@ DROP - para elementos (para lo que se use el CREATE)
 
 DISTINCT (delante del valor que queremos que sea distinto)- cuando tienes muchos valores para que te de lso que son distintos
 
+COUNT SUMA FILAS, 
+SUM SUMA EL VALOR DE DENTRO DE LAS CELDAS SI CUMPLEN UNA CONDICION
+
+ORDEN SELECT :: SELECT -> FROM -> JOINS -> WHERE -> GROUP BY -> HAVING -> LIMIT

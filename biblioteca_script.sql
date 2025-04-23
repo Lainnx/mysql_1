@@ -157,3 +157,96 @@ ON l.id_editorial = e.id_editorial
 JOIN poblaciones p
 ON e.id_poblacion = p.id_poblacion;
 
+-- de que autor no tenemos libro?
+
+SELECT a.nombre_autor, a.apellido_autor-- , l.titulo_libro
+FROM autores a LEFT JOIN autores_libros al
+ON a.id_autor = al.id_autor
+LEFT JOIN libros l 
+ON l.id_libro = al.id_libro
+WHERE l.titulo_libro IS NULL; -- si es un JOIN normal no importa el orden
+
+-- LAS POBLACIONES que no tienen editorial
+
+SELECT p.poblacion
+FROM poblaciones p left JOIN editoriales e
+ON p.id_poblacion = e.id_poblacion
+WHERE e.nombre_editorial IS NULL;
+
+-- crear tabla usuarios
+
+CREATE TABLE IF NOT EXISTS usuarios(
+id_usuario INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+nombre_usuario VARCHAR(20) NOT NULL,
+apellido_usuario VARCHAR(50) NOT NULL,
+fecha_nacimiento DATE,
+carnet_biblio INT UNIQUE NOT NULL,
+fecha_inscripcion TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+
+SELECT FLOOR(RAND()*(99999999 - 10000000)+1) + 10000000 as carnet;	-- ((max - min)+1)+min random da entre 1 y 0
+
+INSERT INTO usuarios (nombre_usuario, apellido_usuario, fecha_nacimiento, carnet_biblio) VALUES
+("Steve","Jobs","1955-02-24", FLOOR(RAND()*(99999999 - 10000000)+1) + 10000000),
+("Letizia","Jobs","1968-06-30", FLOOR(RAND()*(99999999 - 10000000)+1) + 10000000),
+("Peter","Parker","2000-03-11", FLOOR(RAND()*(99999999 - 10000000)+1) + 10000000),
+("Clark","Kent","1989-09-11", FLOOR(RAND()*(99999999 - 10000000)+1) + 10000000),
+("Lois","Lane","1989-11-06", FLOOR(RAND()*(99999999 - 10000000)+1) + 10000000);
+
+CREATE TABLE IF NOT EXISTS prestamos (
+id_prestamo INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+id_usuario INT NOT NULL,
+id_libro INT NOT NULL,
+fecha_prestamo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+fecha_devolucion timestamp 
+);
+
+INSERT INTO prestamos (id_usuario, id_libro) VALUES
+(1,1),(1,2),(1,3),(2,1),(2,2),(3,1);
+
+
+-- OBTENER los prestamos de los libros prestados
+SELECT l.titulo_libro, COUNT(pr.id_libro)  as prestamos
+FROM libros l NATURAL JOIN prestamos pr
+GROUP BY pr.id_libro;
+
+INSERT INTO prestamos (id_usuario, id_libro) VALUES(4,4);
+
+SELECT l.titulo_libro, COUNT(pr.id_libro)  as prestamos
+FROM libros l NATURAL JOIN prestamos pr
+GROUP BY pr.id_libro
+HAVING prestamos = 1 -- solo los que se han prestado 1 vez
+;
+
+SELECT l.titulo_libro, COUNT(pr.id_libro)  as prestamos
+FROM libros l NATURAL JOIN prestamos pr
+GROUP BY pr.id_libro
+HAVING prestamos > 1; -- se pueden usar los operadores matematicos necesarios
+
+SELECT l.titulo_libro 
+FROM libros l NATURAL JOIN prestamos pr
+GROUP BY pr.id_libro
+HAVING COUNT(pr.id_libro) > 1; 
+
+-- Obtener los libros con menor cantidad de prestamos
+
+SELECT COUNT(p.id_libro) AS minima_cantidad	
+FROM prestamos p
+GROUP BY p.id_libro
+ORDER BY minima_cantidad	-- por defecto ordena en forma ascendente
+LIMIT 1; -- el minimo numero de prestamos que hay
+
+SELECT COUNT(p.id_libro) AS minima_cantidad
+FROM prestamos p
+GROUP BY p.id_libro
+ORDER BY minima_cantidad DESC
+LIMIT 1;
+
+SELECT l.titulo_libro
+FROM libros l
+NATURAL JOIN prestamos p
+GROUP BY p.id_libro
+HAVING COUNT(p.id_libro) = (SELECT COUNT(p.id_libro) AS minima_cantidad
+	FROM prestamos p
+	GROUP BY p.id_libro
+	ORDER BY minima_cantidad -- DESC para max
+	LIMIT 1);	-- having = if, y select anidado, hay que envolver ()
