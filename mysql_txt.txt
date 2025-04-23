@@ -63,8 +63,14 @@ AI - Auto Incremental, cada vez que se añade un item se autoincrementa y se asi
 Datatype
 ENUM - lista de valores posibles (aceptados)
 
-CRUD - Create(Instert) Read(Select) Update Delete(Drop)
+CRUD - Create(Insert) Read(Select) Update Delete(Drop)
 
 claves foraneas SIEMPRE se relacionan con una clave principal(de otra tabla)
 
 PARA EXPORTAR -- EXPORT TO SELF-CONTAINED FILE
+
+DELETE - para datos (Insert)
+DROP - para elementos (para lo que se use el CREATE)
+
+DISTINCT (delante del valor que queremos que sea distinto)- cuando tienes muchos valores para que te de lso que son distintos
+

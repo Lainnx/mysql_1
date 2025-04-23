@@ -80,7 +80,7 @@ VALUES("La vuelta al mundo en 80 días", "Taurus", 5),
 -- VINCULACIÓN RELACIONES AUTORES_LIBROS
 
 INSERT INTO autores_libros (id_autor, id_libro)
-VALUES(1, 1),(1,2),(2,3),(3,4);
+VALUES(1,1),(1,2),(2,3),(3,4);
 
 -- necesitamos tabla para editoriales (el dato editorial se repite)
 
@@ -92,3 +92,68 @@ id_poblacion INT NOT NULL);	-- esta sera llave foranea cuando creemos tabla pobl
 CREATE TABLE IF NOT EXISTS poblaciones(
 id_poblacion INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
 poblacion VARCHAR(25));
+
+ALTER TABLE editoriales DROP COLUMN id_poblacion; -- borra columna
+
+-- obtener solo las editoriales de la tabla libros (SELECT)
+
+INSERT INTO editoriales(nombre_editorial)
+SELECT DISTINCT editorial FROM libros;	-- en lugar de VALUES pone el resultado del SELECT
+
+-- Añadir la columna id_editorial a la tabla libros
+
+ALTER TABLE libros ADD COLUMN id_editorial int NOT NULL;
+
+-- pasa dato id_editorial a libros desde editoriales cuando nombre_editorial sea el mismo
+
+UPDATE libros as l,	-- l alias de libros
+editoriales e
+SET l.id_editorial = e.id_editorial
+WHERE l.editorial = e.nombre_editorial;
+
+ALTER TABLE libros DROP COLUMN editorial;
+
+INSERT INTO poblaciones (poblacion) VALUES ("Barcelona"),("Madrid"),("Cornellà"),("París");
+
+ALTER TABLE editoriales ADD COLUMN id_poblacion int NOT NULL;
+
+SELECT SUM(ejemplares_stock) as "Stock total" FROM libros; -- si es solo una palabra no hacen falta ""
+
+-- sistema simple pero NO recomendado (solo casos muy especificos)
+
+SELECT l.titulo_libro, e.nombre_editorial	-- (l.|e.)así se evita ambiguedad, el motor ya sabe en que tabla esta cada columna
+FROM libros l, editoriales e	-- el FROM se ejecuta primero, por eso se puede asignar alias luego
+WHERE l.id_editorial = e.id_editorial; -- desventajas: si tienes que vincular muchas tablas no funciona, o si tiene que haber más condiciones
+-- solo funciona con consultas simples
+
+-- SISTEMA DE VINCULACIÓN RECOMENDADO / (INNER) JOIN [la parte común de ambos]
+
+SELECT l.titulo_libro, e.nombre_editorial	-- la informacion que quieres
+FROM libros l JOIN editoriales e	-- donde estan estos datos, uno en libros y otro en editoriales
+ON l.id_editorial = e.id_editorial;
+
+-- si se llama igual el dato(nombre columna) que vincula las tablas NATURAL JOIN
+
+SELECT l.titulo_libro, e.nombre_editorial	
+FROM libros l NATURAL JOIN editoriales e;
+
+SELECT p.poblacion, e.nombre_editorial
+FROM poblaciones p NATURAL JOIN editoriales e;
+
+-- Nombre autor, titulo libro, editorial, poblacion
+
+SELECT a.nombre_autor, a.apellido_autor, l.titulo_libro, e.nombre_editorial, p.poblacion
+FROM autores a NATURAL JOIN autores_libros al NATURAL JOIN libros l NATURAL JOIN editoriales e NATURAL JOIN poblaciones p; -- NATURAL JOIN porque los datos comunes se llaman igual
+
+-- cada JOIN va con un ON, sería JOIN **** ON **** JOIN **** ON ****;
+
+SELECT a.nombre_autor, a.apellido_autor, l.titulo_libro, e.nombre_editorial, p.poblacion
+FROM autores a JOIN autores_libros al 
+ON a.id_autor = al.id_autor
+JOIN libros l 
+ON al.id_libro = l.id_libro
+JOIN editoriales e 
+ON l.id_editorial = e.id_editorial
+JOIN poblaciones p
+ON e.id_poblacion = p.id_poblacion;
+
