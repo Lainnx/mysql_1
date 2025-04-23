@@ -6,6 +6,7 @@ C:\Program Files\MySQL\MySQL Server 8.4\bin > cmd
 
 (en el cmd)
 .\mysql -u root -p -P 3307 	(-p para que pida pass, -P porque le hemos cambiado el puerto)
+				(o en el workbench directamente)
 
 SHOW DATABASES; #(para que muestre las bases de datos existentes, windows no detecta mayus pero mejor MAYUS)
 			cuando creamos BD podemos elegir si es case sensitive o no
@@ -61,3 +62,7 @@ Datatype
 ENUM - lista de valores posibles (aceptados)
 
 CRUD - Create(Instert) Read(Select) Update Delete(Drop)
+
+claves foraneas SIEMPRE se relacionan con una clave principal(de otra tabla)
+
+PARA EXPORTAR -- EXPORT TO SELF-CONTAINED FILE
