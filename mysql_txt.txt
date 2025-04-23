@@ -33,6 +33,8 @@ ejemplares_stock smallint -- ,
 
 INSERT
 *****************************
+
+*****************************
 workbench - cliente mysql
 
 edit>preferences: 

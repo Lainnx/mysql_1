@@ -58,8 +58,8 @@ LIMIT 1	-- que solo muestre el primero, en otros sistemas funciona de otra maner
 
 SELECT CONCAT_WS(", ",UPPER(apellido_autor), nombre_autor) AS autor	-- white space, indicamos lo que queremos que use entre medio y despues concatenamos todo lo que necesitemos, LAS FUNCIONES SE PUEDEN ANIDAR
 FROM autores
-ORDER BY apellido_autor
-LIMIT 1	-- que solo muestre el primero, en otros sistemas funciona de otra manera(poniendo top 1 arriba)
+ORDER BY apellido_autor DESC, nombre_autor ASC	-- se pueden concatenar diferentes tipos de orden, si encuentra dos caracteristicas iguales usará el segundo orden
+-- LIMIT 1	-- que solo muestre el primero, en otros sistemas funciona de otra manera(poniendo top 1 arriba)
 ;
 
 DESCRIBE libros;	-- describe la tabla libros
@@ -67,3 +67,28 @@ describe autores_libros;
 
 ALTER TABLE libros 
 DROP COLUMN id_autor;
+
+
+-- INSERTS LIBROS
+
+INSERT INTO libros (titulo_libro, editorial, ejemplares_stock) 
+VALUES("La vuelta al mundo en 80 días", "Taurus", 5),
+("De la tierra a la Luna", "Taurus", 3),
+("Yo, robot", "Gredos", 3),
+("Solaris", "Alfahuara", 5);
+
+-- VINCULACIÓN RELACIONES AUTORES_LIBROS
+
+INSERT INTO autores_libros (id_autor, id_libro)
+VALUES(1, 1),(1,2),(2,3),(3,4);
+
+-- necesitamos tabla para editoriales (el dato editorial se repite)
+
+CREATE TABLE IF NOT EXISTS editoriales(
+id_editorial INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+nombre_editorial VARCHAR(50) NOT NULL,
+id_poblacion INT NOT NULL);	-- esta sera llave foranea cuando creemos tabla poblaciones
+
+CREATE TABLE IF NOT EXISTS poblaciones(
+id_poblacion INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+poblacion VARCHAR(25));
