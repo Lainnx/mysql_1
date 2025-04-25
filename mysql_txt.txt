@@ -67,8 +67,11 @@ CRUD - Create(Insert) Read(Select) Update Delete(Drop)
 
 claves foraneas SIEMPRE se relacionan con una clave principal(de otra tabla)
 
-PARA EXPORTAR -- EXPORT TO SELF-CONTAINED FILE
-
+PARA EXPORTAR -SERVER - DATA EXPORT- 
+	MARCAR LAS 3 OPCIONES
+	EXPORT TO SELF-CONTAINED FILE 
+	CREATE DUMP
+	INCLUDE CREATE SCHEMA
 DELETE - para datos (Insert)
 DROP - para elementos (para lo que se use el CREATE)
 
@@ -83,3 +86,7 @@ Vinculando desde modo grafico despues de hacerlo: Database > Forward Engineer (p
 
 ON DELETE NO ACTION	-- IMPORTANTE NO OLVIDAR ESTO!!
 ON UPDATE NO ACTION
+
+COLLATE utf8mb4_0900_ai_ci - en workbench
+	utf8mb4_general_ci - en mariadb(en workbench no funciona bien)
+	
