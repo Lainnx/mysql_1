@@ -78,3 +78,5 @@ COUNT SUMA FILAS,
 SUM SUMA EL VALOR DE DENTRO DE LAS CELDAS SI CUMPLEN UNA CONDICION
 
 ORDEN SELECT :: SELECT -> FROM -> JOINS -> WHERE -> GROUP BY -> HAVING -> LIMIT
+
+Vinculando desde modo grafico despues de hacerlo: Database > Forward Engineer (para aplicar los cambios) o apply(si desde local instance)
