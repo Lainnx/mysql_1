@@ -270,7 +270,7 @@ ADD CONSTRAINT fk_libros_prestamos
 FOREIGN KEY(id_libro)
 REFERENCES libros(id_libro)
 ON DELETE NO ACTION
-ON UPDATE NO ACTION,
+ON UPDATE NO ACTION, -- "," para encadenar (siempre que se esté alterando la misma tabla)
 ADD CONSTRAINT fk_usuarios
 FOREIGN KEY(id_usuario)
 REFERENCES usuarios(id_usuario)
