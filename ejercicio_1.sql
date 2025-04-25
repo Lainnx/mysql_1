@@ -1,3 +1,4 @@
+
 CREATE DATABASE IF NOT EXISTS renting_cars;
 
 USE renting_cars;
@@ -15,7 +16,7 @@ id_cliente INT NOT NULL,
 CONSTRAINT  fk_clientes
 FOREIGN KEY (id_cliente)
 REFERENCES clientes(id_cliente)
-ON DELETE NO ACTION
+ON DELETE NO ACTION	-- IMPORTANTE NO OLVIDAR ESTO
 ON UPDATE NO ACTION
 );
 
@@ -34,6 +35,8 @@ id_proveedor INT NOT NULL,
 CONSTRAINT fk_proveedor
 FOREIGN KEY (id_proveedor)
 REFERENCES proveedores(id_proveedor)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
 );
 
 
@@ -45,9 +48,13 @@ id_producto INT NOT NULL,
 cantidad INT NOT NULL,
 CONSTRAINT fk_vp_ventas
 FOREIGN KEY (id_venta)
-REFERENCES ventas(id_venta),
+REFERENCES ventas(id_venta)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION,
 CONSTRAINT fk_vp_productos
 FOREIGN KEY (id_producto)
 REFERENCES productos(id_producto)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
 );
 
