@@ -250,3 +250,47 @@ HAVING COUNT(p.id_libro) = (SELECT COUNT(p.id_libro) AS minima_cantidad
 	GROUP BY p.id_libro
 	ORDER BY minima_cantidad -- DESC para max
 	LIMIT 1);	-- having = if, y select anidado, hay que envolver ()
+    
+    
+-- VINCULACION entre tabla editoriales (fk id_poblacion) y tabla poblaciones (pk id_poblacion)
+-- las constrains se tienen que aplicar sobre la tabla con la clave foranea (editoriales en este caso)
+-- esto se puede hacer con el esquema (EER) o así
+
+ALTER TABLE editoriales -- la tabla a modificar(donde creamos la constraint)
+ADD CONSTRAINT fk_poblaciones -- nombre constraint
+FOREIGN KEY (id_poblacion) -- que ya tiene la tabla
+REFERENCES poblaciones(id_poblacion) -- a que tabla y con que dato se vincula
+ON DELETE NO ACTION -- que pasa si se borra
+ON UPDATE NO ACTION; -- que pasa si hay un update
+
+-- Prestamos con libros, prestamos con usuarios
+
+ALTER TABLE prestamos
+ADD CONSTRAINT fk_libros_prestamos
+FOREIGN KEY(id_libro)
+REFERENCES libros(id_libro)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION,
+ADD CONSTRAINT fk_usuarios
+FOREIGN KEY(id_usuario)
+REFERENCES usuarios(id_usuario)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION;
+
+ALTER TABLE autores
+ADD COLUMN id_epoca INT;
+
+CREATE TABLE IF NOT EXISTS epocas (
+id_epoca INT PRIMARY KEY AUTO_INCREMENT,
+epoca VARCHAR(20) NOT NULL
+);
+
+ALTER TABLE autores
+ADD CONSTRAINT fk_epoca
+FOREIGN KEY (id_epoca)
+REFERENCES epocas(id_epoca)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION;
+
+UPDATE autores 
+SET id_epoca = 1; -- al haber creado la tabla epoca vacía habia un daba error al no encontrar los id_epoca de autores(todos a 0) en epocas
