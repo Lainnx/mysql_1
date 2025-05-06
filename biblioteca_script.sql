@@ -294,3 +294,34 @@ ON UPDATE NO ACTION;
 
 UPDATE autores 
 SET id_epoca = 1; -- al haber creado la tabla epoca vacía habia un daba error al no encontrar los id_epoca de autores(todos a 0) en epocas
+
+-- PROCEDIMIENTO ALMACENADO (CALL) (CON LOS COMENTARIOS NO FUNCIONA)
+
+DELIMITER $$ -- para cambiar el delimitador (;) por ($$) para que el código que pongamos dentro no se ejecute hasta que el procedimiento esté creado
+
+CREATE PROCEDURE insertUsuario ( p_nombre varchar(20), p_apellido varchar(50), p_fecha_nacimiento date )	-- in, out, inout, campos que el procedimiento puede modificar, por defecto in
+																				-- p_ prefijo para diferenciar parametros de variables/ argumentos (es como en una funcion)
+                                                                                -- hay que respetar los tipos de los campos, si vamos a operar sobre varchar(20) hay que poner lo mismo
+BEGIN -- para indicarle al procedimiento que tiene que empezar
+
+INSERTINTO usuarios (nombre_usuario, apellido_usuario, fecha_nacimiento, carnet_biblio) VALUES
+(p_nombre, p_apellido, p_fecha_nacimiento, FLOOR(RAND()*(99999999 - 10000000)+1) + 10000000);	-- este ; no será válido hasta que se cambie el delimitador de vuelta (ahora es $$)
+
+END $$ -- para que acabe el procedimiento, el delimitador esta cambiado a $$, SOLO AQUI		
+									
+DELIMITER ; -- para cambiar el delimitador de vuelta, IMPORTANTE ESPACIO ENTRE DELIMITER Y CARACTERES
+-- --------------------------------------------------------------------------------------------------------^^
+
+DELIMITER $$ 
+
+CREATE PROCEDURE insertUsuario ( p_nombre varchar(20), p_apellido varchar(50), p_fecha_nacimiento date )
+BEGIN
+
+INSERT INTO usuarios (nombre_usuario, apellido_usuario, fecha_nacimiento, carnet_biblio) VALUES
+(p_nombre, p_apellido, p_fecha_nacimiento, FLOOR(RAND()*(99999999 - 10000000)+1) + 10000000);
+
+END $$	
+									
+DELIMITER ;
+
+CALL insertUsuario ("Bruce", "Wayne", "1998-06-09");	-- CALL para llamar al PROCEDURE
