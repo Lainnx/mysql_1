@@ -325,3 +325,62 @@ END $$
 DELIMITER ;
 
 CALL insertUsuario ("Bruce", "Wayne", "1998-06-09");	-- CALL para llamar al PROCEDURE
+
+-- Procedimiento Almacenado (Stored Procedure -> SP)
+-- Insercion completa de un libro
+DELIMITER //
+CREATE PROCEDURE insertLibro (
+p_titulo_libro varchar(100),
+p_ejemplares_stock smallint,
+p_nombre_editorial varchar(50),
+p_poblacion varchar(25),
+p_nombre_autor varchar(50),
+p_apellido_autor varchar(100),
+p_epoca varchar(20)
+)
+BEGIN
+
+	-- SET @ variable global, problema- variable GLOBAL, en memoria se queda la variable y si luego usas el mismo nombre tomara el valor antiguo, NO ADECUADO
+-- SET @id_poblacion =(SELECT id_poblacion FROM poblaciones WHERE poblacion = p_poblacion); -- si el select no devuelve nada es que no existe lo que estas intentando seleccionar (Si tiene valor existe)
+
+-- variables locales se crean en 2 pasos:
+-- 1: DEFINIR / los DECLARE TIENEN QUE IR ARRIBA SEGUIDOS UNO DEL OTRO TODOS JUNTOS
+DECLARE v_id_poblacion int;	-- declarar variable local (SIN @), v_ para saber que es una variable y no confundir luego cuando usemos campo id_poblacion
+DECLARE v_id_editorial int;
+DECLARE v_id_libro int;
+-- 2: ASIGNAR con INTO desde de donde le queremos dar el valor
+/*Encontrar el id de la población si está, si no está sera nulo, entonces se inserta el valor indicado(se crea) y se selecciona para seguir operando*/
+SELECT id_poblacion INTO v_id_poblacion FROM poblaciones WHERE poblacion = p_poblacion;	
+/*Encontrar el id de la editorial*/
+SELECT id_editorial INTO v_id_editorial FROM editoriales WHERE nombre_editorial = p_nombre_editorial;
+/*Encontrar el id del libro*/
+SELECT id_libro INTO v_id_libro FROM libros WHERE titulo_libro = p_titulo_libro;
+
+IF v_id_poblacion IS NULL THEN 
+	INSERT INTO poblaciones(poblacion) VALUES (p_poblacion);
+    SELECT id_poblacion INTO v_id_poblacion FROM poblaciones WHERE poblacion = p_poblacion;	
+END IF; -- TODO IF TIENE QUE TERMINAR
+IF v_id_editorial IS NULL THEN
+	INSERT INTO editoriales(nombre_editorial, id_poblacion) VALUES (p_nombre_editorial, v_id_poblacion); 
+    SELECT id_editorial INTO v_id_editorial FROM editoriales WHERE nombre_editorial = p_nombre_editorial;
+END IF;
+IF v_id_libro IS NULL THEN
+	INSERT INTO libros(titulo_libro, ejemplares_stock, id_editorial) VALUES (p_titulo_libro, p_ejemplares_stock, v_id_editorial); 
+	SELECT id_libro INTO v_id_libro FROM libros WHERE titulo_libro = p_titulo_libro;
+-- si el libro ya existe hay que aumentar el stock
+ELSE
+	UPDATE libros SET ejemplares_stock = ejemplares_stock + p_ejemplares_stock WHERE id_libro = v_id_libro; -- IMPORTANTE EL WHERE O SE ACTUALIZA TODO
+END IF;
+
+
+END //
+DELIMITER ;
+
+CALL insertLibro (
+"MySQL",
+5,
+"X",
+"Albacete",
+"A",
+"P",
+"Futuro");
