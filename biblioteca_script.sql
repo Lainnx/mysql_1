@@ -434,16 +434,20 @@ FOR EACH ROW
 BEGIN
 DECLARE v_stock INT;
 DECLARE v_libros_prestados int;
+DECLARE v_limite_libros int;
 
+
+SELECT COUNT(id_prestamo) INTO v_limite_libros from prestamos WHERE id_usuario = new.id_usuario;
 SELECT COUNT(id_libro) INTO v_libros_prestados FROM prestamos WHERE id_libro = new.id_libro and id_usuario = new.id_usuario;
 SELECT  ejemplares_stock INTO v_stock FROM libros WHERE id_libro = new.id_libro;
 
-IF v_libros_prestados = 1 THEN 
+IF v_limite_libros >= 2 THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Ya tienes el limite de libros";
+END IF;
+IF v_libros_prestados >= 1 THEN 
 	-- funciona como un return, termina la funcion
 	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Ya tienes el libro prestado";
 END IF;
-
-
 
 IF v_stock < 1 THEN 
 	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "No hay ejemplares disponibles"; -- codigo de error que sabemos que no esta ocupado
@@ -455,4 +459,26 @@ END IF;
 END $$										
 DELIMITER ;
 
-INSERT INTO prestamos (id_usuario, id_libro) VALUES (1,1);
+INSERT INTO prestamos (id_usuario, id_libro) VALUES (2,3);
+
+-- crear un trigger que incremente stock +1 al borrar un prestamo (al devolver)
+
+-- cuantos ejemplares de un libro estan en prestamo
+DELIMITER $$
+CREATE FUNCTION fn_prestamos (p_titulo varchar(100))
+RETURNS int
+DETERMINISTIC -- si no cambia por muchas veces que se ejecute (siempre va a obtener el mismo resultado dado el mismo input)
+BEGIN
+DECLARE v_prestamos int;
+SELECT COUNT(p.id_libro) INTO v_prestamos
+FROM prestamos p
+NATURAL JOIN libros l
+WHERE l.titulo_libro = p_titulo;	-- p_ de parametro
+
+RETURN v_prestamos;
+END $$
+
+DELIMITER ;
+
+SELECT titulo_libro, fn_prestamos(titulo_libro)
+FROM libros;
