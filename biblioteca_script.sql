@@ -350,6 +350,7 @@ DECLARE v_id_editorial int;
 DECLARE v_id_libro int;
 -- 2: ASIGNAR con INTO desde de donde le queremos dar el valor
 /*Encontrar el id de la población si está, si no está sera nulo, entonces se inserta el valor indicado(se crea) y se selecciona para seguir operando*/
+
 SELECT id_poblacion INTO v_id_poblacion FROM poblaciones WHERE poblacion = p_poblacion;	
 /*Encontrar el id de la editorial*/
 SELECT id_editorial INTO v_id_editorial FROM editoriales WHERE nombre_editorial = p_nombre_editorial;
@@ -384,3 +385,32 @@ CALL insertLibro (
 "A",
 "P",
 "Futuro");
+
+-- consultas complejas, de un libro saber todo
+-- vamos a hacer un select que nos dé todos los libros que tenemos con todos los datos que tiene (menos id's)
+-- titulo libro, ejemplares stock, nombre editorial, nombre autor, apellido autor, epoca
+use biblioteca;
+
+DROP VIEW IF EXISTS vista_libros;	-- no se puede modificar una vista, hay que borrar primero y volver a crear con los nuevos ajustes
+CREATE VIEW vista_libros AS	-- PARA guardar la consulta en la base de datos y no tener que escribir de nuevo el SELECT si pierdes el codigo
+SELECT li.titulo_libro, li.ejemplares_stock, au.nombre_autor, au.apellido_autor, ep.epoca, ed.nombre_editorial, po.poblacion
+FROM poblaciones po 
+NATURAL JOIN editoriales ed 
+NATURAL JOIN libros li
+NATURAL JOIN autores_libros al
+NATURAL JOIN autores au
+NATURAL JOIN epocas ep
+ORDER BY li.titulo_libro;
+
+SELECT * FROM vista_libros;	-- si actualizas las tablas la vista tambien se actualiza, es una tabla virtual, que se nutre de otras tablas
+
+-- TRIGGER
+-- es como un evento, cuando pasa algo hay una reacción
+-- Insert, update delete para datos
+
+DELIMITER $$
+-- crear trigger
+CREATE TRIGGER tr_sencillo
+-- si se va a ejecutar antes (BEFORE) o después(AFTER) de la acción sobre los datos de la tabla (INSERT, UPDATE, DELETE)
+
+DELIMITER ;
