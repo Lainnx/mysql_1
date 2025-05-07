@@ -406,11 +406,53 @@ SELECT * FROM vista_libros;	-- si actualizas las tablas la vista tambien se actu
 
 -- TRIGGER
 -- es como un evento, cuando pasa algo hay una reacción
--- Insert, update delete para datos
+-- INSERT, UPDATE DELETE para datos
 
+-- al hacer INSERT UPDATE O DELETE se bloquea la tabla, si hay muchos datos y el trigger intenta acceder mientras esta bloqueada dará error(solo para tablas muy grandes)
+/*
 DELIMITER $$
 -- crear trigger
 CREATE TRIGGER tr_sencillo
 -- si se va a ejecutar antes (BEFORE) o después(AFTER) de la acción sobre los datos de la tabla (INSERT, UPDATE, DELETE)
-
+AFTER INSERT ON usuarios
+FOR EACH ROW	-- para que se asegure que los datos son nuevos(mira toda la tabla)
+BEGIN
+SELECT CONCAT_WS(" ","Se ha añadido el usuario", new.nombre_usuario, new.apellido_usuario); 	-- SELECT siempre es para mostrar
+END $$										
 DELIMITER ;
+*/
+
+-- NO HACER DOS TRIGGERS DISTINTOS (si las 2 cosas van antes, despues...), HACER UN TRIGGER QUE HAGA LAS 2 COSAS (sino saber que trigger se ejecuta primero es un lio)
+DROP TRIGGER IF EXISTS tr_disponibilidad;
+
+DELIMITER $$
+
+CREATE TRIGGER tr_disponibilidad
+
+BEFORE INSERT ON prestamos
+FOR EACH ROW	
+BEGIN
+DECLARE v_stock INT;
+DECLARE v_libros_prestados int;
+
+SELECT COUNT(id_libro) INTO v_libros_prestados FROM prestamos WHERE id_libro = new.id_libro and id_usuario = new.id_usuario;
+SELECT  ejemplares_stock INTO v_stock FROM libros WHERE id_libro = new.id_libro;
+
+IF v_libros_prestados = 1 THEN 
+	-- funciona como un return, termina la funcion
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "Ya tienes el libro prestado";
+END IF;
+
+
+
+IF v_stock < 1 THEN 
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "No hay ejemplares disponibles"; -- codigo de error que sabemos que no esta ocupado
+
+ELSE
+	UPDATE libros SET ejemplares_stock = ejemplares_stock - 1 WHERE id_libro = new.id_libro;
+END IF;
+
+END $$										
+DELIMITER ;
+
+INSERT INTO prestamos (id_usuario, id_libro) VALUES (1,1);
