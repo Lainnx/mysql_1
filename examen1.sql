@@ -1,0 +1,86 @@
+DROP DATABASE IF EXISTS colegio;
+CREATE DATABASE IF NOT EXISTS colegio;
+USE colegio;
+
+CREATE TABLE IF NOT EXISTS localidad(
+id_localidad INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+nombre_localidad VARCHAR(50) NOT NULL 
+);
+
+CREATE TABLE IF NOT EXISTS curso(
+id_curso INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+nombre_curso VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS asignaturas(
+id_asignatura INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+nombre_asignatura VARCHAR(100) NOT NULL,
+id_curso INT NOT NULL,
+CONSTRAINT fk_curso
+FOREIGN KEY (id_curso)
+REFERENCES curso(id_curso)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS alumnos(
+id_alumno INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+nombre_alumno VARCHAR(20) NOT NULL,
+apellido_alumno VARCHAR(50) NOT NULL,
+fecha_nacimiento DATE NOT NULL,
+nif_nie VARCHAR(9) NOT NULL,
+id_localidad INT NOT NULL,
+CONSTRAINT fk_localidad_a
+FOREIGN KEY (id_localidad)
+REFERENCES localidad(id_localidad)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS asig_alumnos(
+id_aa INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+id_alumno INT NOT NULL,
+id_asignatura INT NOT NULL,
+anyo_matricula INT NOT NULL,
+CONSTRAINT fk_alumnos
+FOREIGN KEY (id_alumno)
+REFERENCES alumnos(id_alumno)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION,
+CONSTRAINT fk_asignaturas_aa
+FOREIGN KEY (id_asignatura)
+REFERENCES asignaturas(id_asignatura)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS profes(
+id_profe INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+nombre_profe VARCHAR(20) NOT NULL,
+apellido_profe VARCHAR(50) NOT NULL,
+fecha_nacimiento DATE NOT NULL,
+nif_nie VARCHAR(9) NOT NULL,
+id_localidad INT NOT NULL,
+CONSTRAINT fk_localidad_p
+FOREIGN KEY (id_localidad)
+REFERENCES localidad(id_localidad)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS asig_profes(
+id_ap INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+id_asignatura INT NOT NULL,
+id_profe INT NOT NULL,
+anyo_imparticion INT NOT NULL,
+CONSTRAINT fk_asignatura_ap
+FOREIGN KEY (id_asignatura)
+REFERENCES asignaturas(id_asignatura)
+ON UPDATE NO ACTION
+ON DELETE NO ACTION,
+CONSTRAINT fk_profes_ap
+FOREIGN KEY (id_profe)
+REFERENCES profes(id_profe)
+ON UPDATE NO ACTION
+ON DELETE NO ACTION
+);
