@@ -10,3 +10,5 @@ color_en varchar(25)
 );
 
 INSERT INTO colores(usuario, color_es, color_en) VALUES ("Tarzan", "verde", "green"),("Dani","darksalmon", "darksalmon");
+
+CREATE USER "colores" @'%' IDENTIFIED by "colores"; -- @ '%' para que se pueda conectar de forma remota, identified by PASS
