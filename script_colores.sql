@@ -28,3 +28,7 @@ ALTER TABLE colores
 ADD COLUMN id_usuario INT NOT NULL DEFAULT "1";
 
 ALTER TABLE usuarios ADD COLUMN email VARCHAR(150);
+
+ALTER TABLE usuarios 
+ADD COLUMN reset_token VARCHAR(255),
+ADD COLUMN reset_expire DATETIME;
