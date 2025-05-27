@@ -32,3 +32,47 @@ ALTER TABLE usuarios ADD COLUMN email VARCHAR(150);
 ALTER TABLE usuarios 
 ADD COLUMN reset_token VARCHAR(255),
 ADD COLUMN reset_expire DATETIME;
+
+-- 66666666666666666666666666666666666666666666666666666666666666666
+
+drop trigger tr_ins_passreset;
+
+DELIMITER $$
+
+CREATE TRIGGER tr_ins_passreset
+AFTER UPDATE ON passreset
+for each row
+BEGIN
+UPDATE usuarios set password_usuario = new.pass where id_usuario = new.id_usuario;
+DELETE FROM passreset where id_usuario = new.id_usuario;
+END $$
+DELIMITER ;
+
+drop trigger tr_ins_usuario
+DELIMITER $$
+
+CREATE TRIGGER tr_ins_usuario
+AFTER UPDATE ON usuarios
+for each row
+BEGIN
+DELETE FROM passreset where id_usuario = new.id_usuario;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE reset_pass(IN p_id_usuario INT, IN p_pass VARCHAR(255))
+BEGIN
+DECLARE v_pass varchar(255);
+SELECT pass INTO v_pass -- el valor de la contraseña se guarda en esta variable
+FROM passreset WHERE id_usuario = p_id_usuario;
+
+-- UPDATE pasreset set pass=p_pass where id_usuario = p_id_usuario;
+UPDATE usuarios set password_usuario = p_pass where id_usuario = p_id_usuario;
+DELETE FROM passreset where id_usuario = p_id_usuario;
+SELECT "OK" AS resultado;
+END $$
+
+DELIMITER ;
+
+CALL reset_pass (3);
