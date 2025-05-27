@@ -129,6 +129,11 @@ NATURAL JOIN cajas c;
 SELECT id_almacen, COUNT(id_almacen)
 FROM cajas
 GROUP BY id_almacen;
+
+SELECT a.id_almacen, COUNT(a.id_almacen)
+FROM almacenes a 
+LEFT JOIN cajas c
+ON a.id_almacen = c.id_almacen 
 -- 9. Obtener los códigos de los almacenes que están saturados (los almacenes donde el número de cajas es superior a la capacidad).
 -- 10. Obtener los números de referencia de las cajas que están en Bilbao
 -- 11. Insertar un nuevo almacén en Barcelona con capacidad para 3 cajas.
