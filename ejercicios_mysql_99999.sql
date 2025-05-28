@@ -1,16 +1,16 @@
 -- Ejercicio1 - Empleados
 
-CREATE DATABASE empleados;
+CREATE DATABASE IF NOT EXISTS empleados;
 USE empleados;
 
-CREATE TABLE empleados(
+CREATE TABLE IF NOT EXISTS empleados(
 DNI VARCHAR(9) PRIMARY KEY NOT NULL,
 nombre VARCHAR(100) NOT NULL,
 apellidos VARCHAR(255) NOT NULL,
 id_departamento INT NOT NULL
 );
 
-CREATE TABLE departamentos(
+CREATE TABLE IF NOT EXISTS departamentos(
 id_departamento INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
 nombre VARCHAR(100) NOT NULL,
 presupuesto DECIMAL(9,2) not null
@@ -84,15 +84,15 @@ DELETE FROM empleados;
 
 -- Ejercicio 2 - Almacenes
 
-CREATE DATABASE almacenes;
+CREATE DATABASE IF NOT EXISTS almacenes;
 USE almacenes;
 
-CREATE TABLE almacenes(
+CREATE TABLE IF NOT EXISTS almacenes(
 id_almacen INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
 lugar VARCHAR(100) NOT NULL,
 capacidad INT NOT NULL
 );
-CREATE TABLE cajas(
+CREATE TABLE IF NOT EXISTS cajas(
 num_referencia VARCHAR(5) PRIMARY KEY NOT NULL,
 contenido VARCHAR(100) NOT NULL,
 valor DECIMAL(6,2) NOT NULL,
@@ -128,14 +128,34 @@ NATURAL JOIN cajas c;
 -- 8. Obtener el número de cajas que hay en cada almacén.
 SELECT id_almacen, COUNT(id_almacen)
 FROM cajas
-GROUP BY id_almacen;
+GROUP BY id_almacen;	-- no salen los almacenes con 0 cajas
 
-SELECT a.id_almacen, COUNT(a.id_almacen)
+SELECT a.id_almacen, COUNT(c.id_almacen)
 FROM almacenes a 
 LEFT JOIN cajas c
-ON a.id_almacen = c.id_almacen 
+ON a.id_almacen = c.id_almacen
+GROUP BY a.id_almacen;
 -- 9. Obtener los códigos de los almacenes que están saturados (los almacenes donde el número de cajas es superior a la capacidad).
--- 10. Obtener los números de referencia de las cajas que están en Bilbao
--- 11. Insertar un nuevo almacén en Barcelona con capacidad para 3 cajas.
+SELECT a.id_almacen
+FROM almacenes a
+WHERE a.capacidad < (SELECT COUNT(c.id_almacen) FROM cajas c WHERE a.id_almacen = c.id_almacen);
+-- 10. Obtener los números de referencia de las cajas que están en Badalona
+SELECT num_referencia 
+FROM cajas 
+NATURAL JOIN almacenes
+WHERE lugar = "Badalona";
+-- 11. Insertar un nuevo almacén en Bilbao con capacidad para 3 cajas.
+INSERT INTO almacenes (lugar, capacidad) VALUES("Bilbao",3);
 -- 12. Insertar una nueva caja, con número de referencia ‘H5RT’, con contenido ‘Papel’, valor 200, y situada en el almacén 2.
+INSERT INTO cajas (num_referencia, contenido, valor, id_almacen) VALUES("H5RT","papel",200,2);
 -- 13. Rebajar el valor de todas las cajas un 15 %.
+UPDATE cajas SET valor = valor * 0.85;
+-- 14. Rebajar un 20 % el valor de todas las cajas cuyo valor sea superior al valor medio de todas las cajas.
+SET @promedio = (SELECT AVG(valor) FROM cajas);
+UPDATE cajas SET valor = valor * 0.80 
+WHERE valor > @promedio;
+-- 15. Eliminar todas las cajas cuyo valor sea inferior a 100 Bs.
+DELETE FROM cajas WHERE valor < 100;
+-- 16. Vaciar el contenido de los almacenes que están s
+SET @saturados = (SELECT a.id_almacen FROM almacenes a WHERE a.capacidad < (SELECT COUNT(c.id_almacen) FROM cajas c WHERE a.id_almacen = c.id_almacen));
+DELETE FROM cajas WHERE id_almacen IN @saturados ;
