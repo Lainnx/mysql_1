@@ -1,3 +1,4 @@
+-- 11111111111111111111111111111111111111111111111111111111111111111111111111111
 -- Ejercicio1 - Empleados
 
 CREATE DATABASE IF NOT EXISTS empleados;
@@ -82,6 +83,7 @@ DELETE FROM empleados WHERE id_departamento IN(
 -- 17. Despedir a todos los empleados.
 DELETE FROM empleados;
 
+-- 222222222222222222222222222222222222222222222222222222222222222222222
 -- Ejercicio 2 - Almacenes
 
 CREATE DATABASE IF NOT EXISTS almacenes;
@@ -147,7 +149,7 @@ WHERE lugar = "Badalona";
 -- 11. Insertar un nuevo almacén en Bilbao con capacidad para 3 cajas.
 INSERT INTO almacenes (lugar, capacidad) VALUES("Bilbao",3);
 -- 12. Insertar una nueva caja, con número de referencia ‘H5RT’, con contenido ‘Papel’, valor 200, y situada en el almacén 2.
-INSERT INTO cajas (num_referencia, contenido, valor, id_almacen) VALUES("H5RT","papel",200,2);
+INSERT INTO cajas (num_referencia, contenido, valor, id_almacen) VALUES("H5RT1","papel",200,2);
 -- 13. Rebajar el valor de todas las cajas un 15 %.
 UPDATE cajas SET valor = valor * 0.85;
 -- 14. Rebajar un 20 % el valor de todas las cajas cuyo valor sea superior al valor medio de todas las cajas.
@@ -156,6 +158,79 @@ UPDATE cajas SET valor = valor * 0.80
 WHERE valor > @promedio;
 -- 15. Eliminar todas las cajas cuyo valor sea inferior a 100 Bs.
 DELETE FROM cajas WHERE valor < 100;
--- 16. Vaciar el contenido de los almacenes que están s
-SET @saturados = (SELECT a.id_almacen FROM almacenes a WHERE a.capacidad < (SELECT COUNT(c.id_almacen) FROM cajas c WHERE a.id_almacen = c.id_almacen));
-DELETE FROM cajas WHERE id_almacen IN @saturados ;
+-- 16. Vaciar el contenido de los almacenes que están saturados
+/*
+DELETE FROM cajas WHERE id_almacen IN (
+	SELECT a.id_almacen 
+	FROM almacenes a 
+	WHERE a.capacidad < (
+		SELECT COUNT(c.id_almacen) 
+		FROM cajas c 
+		WHERE a.id_almacen = c.id_almacen)) ;
+*/
+DELETE c
+FROM cajas c
+JOIN (
+    SELECT a.id_almacen
+    FROM almacenes a
+    JOIN cajas cc ON a.id_almacen = cc.id_almacen
+    GROUP BY a.id_almacen, a.capacidad
+    HAVING a.capacidad < COUNT(cc.id_almacen)
+) AS sub ON c.id_almacen = sub.id_almacen;
+
+-- 33333333333333333333333333333333333333333333333333333333333333333333333333333333
+-- Ejercicio 3 - Peliculas y salas
+CREATE DATABASE IF NOT EXISTS peliculas;
+use peliculas;
+CREATE TABLE IF NOT EXISTS salas (
+id_sala INT PRIMARY KEY AUTO_INCREMENT,
+nombre_sala VARCHAR(100) NOT NULL,
+id_pelicula INT
+);
+
+CREATE TABLE IF NOT EXISTS peliculas (
+id_pelicula INT PRIMARY KEY AUTO_INCREMENT,
+titulo_pelicula VARCHAR(100) NOT NULL,
+calificacion_edad INT
+);
+
+INSERT INTO peliculas (titulo_pelicula, calificacion_edad) VALUES 
+("Batman", 12),("Bambi", 18),("Tiburón", 6),("El conclave", 12);
+INSERT INTO salas (nombre_sala, id_pelicula) VALUES("Sala 1", 1),("Sala 2",3),("Sala 3",4);
+INSERT INTO peliculas (titulo_pelicula, calificacion_edad) VALUES 
+("Shrek",null),("Scream",null);
+INSERT INTO salas (nombre_sala, id_pelicula) VALUES("Sala 4", null);
+INSERT INTO salas (nombre_sala, id_pelicula) VALUES("Sala 5", null);
+-- 1. Mostrar el nombre de todas las películas.
+SELECT titulo_pelicula FROM peliculas;
+-- 2. Mostrar las distintas calificaciones de edad que existen.
+SELECT DISTINCT calificacion_edad FROM peliculas;
+-- 3. Mostrar todas las películas que no han sido calificadas.
+SELECT titulo_pelicula FROM peliculas WHERE calificacion_edad IS null;
+-- 4. Mostrar todas las salas que no proyectan ninguna película.
+SELECT nombre_sala FROM salas WHERE id_pelicula IS NULL;
+-- 5. Mostrar la información de todas las salas y, si se proyecta alguna película en la sala, mostrar también la información de la película.
+SELECT * 
+FROM salas s
+LEFT JOIN peliculas p
+ON s.id_pelicula = p.id_pelicula;
+-- 5.b Mostrar la información de todas las salas y, si se proyecta alguna película en la sala, mostrar también el titulo de la película.
+SELECT s.nombre_sala, IFNULL(p.titulo_pelicula, "No hay pelicula todavía") -- si resulta que es nulo le decimos que haga algo a continuacion
+FROM salas s
+LEFT JOIN peliculas p
+ON s.id_pelicula = p.id_pelicula;
+-- 6. Mostrar la información de todas las películas y, si se proyecta en alguna sala, mostrar también la información de la sala.
+SELECT * 
+FROM peliculas p
+LEFT JOIN salas s
+ON p.id_pelicula = s.id_pelicula;
+-- 7. Mostrar los nombres de las películas que no se proyectan en ninguna sala.
+SELECT titulo_pelicula 
+FROM peliculas p
+left JOIN salas s
+ON p.id_pelicula = s.id_pelicula WHERE id_sala IS NULL;
+
+-- 8. Añadir una nueva pelıcula ‘Uno, Dos, Tres’, para mayores de 7 años.
+INSERT INTO peliculas (titulo_pelicula, calificacion_edad) VALUES ("Uno, Dos, Tres", 7);
+-- 9. Hacer constar que todas las películas no calificadas han sido calificadas ‘no recomendables para menores de 13 años’.
+-- 10. Eliminar todas las salas que proyectan películas recomendadas para todos los públicos.
