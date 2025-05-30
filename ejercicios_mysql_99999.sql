@@ -326,7 +326,10 @@ cod_art int,
 precio decimal(8,2),
 desciento_lin decimal(5,2)
 );
+
+INSERT INTO provincias (cod_pro, nombre_provincia) VALUES ("BA", "Barcelona"),("GI","Girona"),("TA","Tarragona"),("LL","Lleida");
 -- 1. Mostrar las provincias 
+SELECT nombre_provincia FROM provincias;
 -- 2. Nombre y código de las provincias. 
 -- 3. Mostrar el código de los arYculos y el doble del precio de cada arYculo. 
 -- 4. Mostrar el código de la factura, número de línea e importe de cada línea (sin considerar impuestos 
