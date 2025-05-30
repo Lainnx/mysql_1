@@ -232,5 +232,133 @@ ON p.id_pelicula = s.id_pelicula WHERE id_sala IS NULL;
 
 -- 8. Añadir una nueva pelıcula ‘Uno, Dos, Tres’, para mayores de 7 años.
 INSERT INTO peliculas (titulo_pelicula, calificacion_edad) VALUES ("Uno, Dos, Tres", 7);
+-- Y después hacer que se proyecte al menos en 4 salas.
+SET @id_123 = (SELECT id_pelicula FROM peliculas WHERE titulo_pelicula = "Uno, Dos, Tres");
+INSERT INTO salas (nombre_sala, id_pelicula) VALUES("Sala 1",@id_123), ("Sala 2", @id_123), ("Sala 3", @id_123), ("Sala 4", @id_123);
+
+SELECT titulo_pelicula, COUNT(s.id_pelicula) as cantidad,	/*cantidad nombre que s ele dara al count()*/
+    CASE
+        WHEN COUNT(s.id_pelicula) > 3 THEN "Pelicula muy popular"	/*lo mostrara arriba en vez de count()*/
+        WHEN COUNT(s.id_pelicula) > 0 THEN "Bastante conocida"
+        ELSE "no la ha visto nadie"
+    END as popularidad	/*nombre que se le dara a la columna*/
+FROM salas s
+RIGHT JOIN peliculas p
+ON p.id_pelicula = s.id_pelicula
+GROUP BY titulo_pelicula
+ORDER BY cantidad DESC;
 -- 9. Hacer constar que todas las películas no calificadas han sido calificadas ‘no recomendables para menores de 13 años’.
+UPDATE peliculas SET calificacion_edad = 13 WHERE calificacion_edad IS NULL;
+
 -- 10. Eliminar todas las salas que proyectan películas recomendadas para todos los públicos.
+DELETE s FROM salas s
+JOIN peliculas p
+ON s.id_pelicula = p.id_pelicula
+WHERE p.calificacion_edad < 13;
+
+-- 44444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444
+-- Ejercicio 4 - Los Directores
+
+CREATE DATABASE IF NOT EXISTS directores;
+USE directores;
+
+CREATE TABLE IF NOT EXISTS directores (
+DNI VARCHAR(9) PRIMARY KEY,
+nom_apels VARCHAR(255) NOT NULL,
+DNIjefe VARCHAR(9) NOT NULL,
+despacho INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS despachos(
+numero INT PRIMARY KEY,
+capacidad INT NOT NULL
+);
+
+-- 77777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
+-- 7 - Control de Stock y Facturación
+
+CREATE DATABASE IF NOT EXISTS ejercicio_07;
+USE ejercicio_07;
+
+CREATE TABLE IF NOT EXISTS provincias(
+cod_pro CHAR(2) PRIMARY KEY NOT NULL,
+nombre_provincia VARCHAR(50)
+);
+CREATE TABLE IF NOT EXISTS pueblos(
+cod_pue CHAR(3) PRIMARY KEY NOT NULL,
+nombre_pueblo VARCHAR(50),
+cod_pro CHAR(2) NOT NULL
+);
+CREATE TABLE IF NOT EXISTS clientes(
+cod_cli INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nombre_cliente VARCHAR(100) NOT NULL,
+direccion_cli varchar(100) not null,
+codpostal_cli char(5),
+cod_pue char(3)
+);
+CREATE TABLE IF NOT EXISTS vendedores(
+cod_ven INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nombre_vendedor VARCHAR(100) NOT NULL,
+direccion_ven varchar(100) not null,
+codpostal_ven char(5),
+cod_pue char(3)
+);
+CREATE TABLE IF NOT EXISTS articulos(
+cod_art INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+descripcion_art VARCHAR(100) NOT NULL,
+precio_art decimal(8,2),
+stock_art int,
+stock_min int
+);
+CREATE TABLE IF NOT EXISTS facturas(
+cod_fac INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+fecha_fac datetime,
+cod_cli INT, 
+cod_ven INT,
+iva int,
+descuento_fac decimal(5,2)
+);
+CREATE TABLE IF NOT EXISTS lineas_fac(
+cod_lin_fac INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+cod_fac int,
+cant_lin decimal(8,2),
+cod_art int,
+precio decimal(8,2),
+desciento_lin decimal(5,2)
+);
+-- 1. Mostrar las provincias 
+-- 2. Nombre y código de las provincias. 
+-- 3. Mostrar el código de los arYculos y el doble del precio de cada arYculo. 
+-- 4. Mostrar el código de la factura, número de línea e importe de cada línea (sin considerar impuestos 
+-- ni descuentos. 
+-- 5. Mostrar los dis8ntos 8pos de IVA aplicados en las facturas. 
+-- 6. Mostrar el código y nombre de aquellas provincias cuyo código es menor a 20. 
+-- 7. Mostrar los dis8ntos 8pos de descuento de aplicados por los vendedores que cuyos códigos no  superan el valor 50. 
+-- 8. Mostrar el código y descripción de aquellos arYculos cuyo stock es igual o supera los 50 unidades. 
+-- 9. Mostrar el código y fechas de las facturas con IVA 16 y que pertenecen al cliente de código 100. 
+-- 10. Mostrar el código y fechas de las facturas con IVA 16 o con descuento 20 y que pertenecen al cliente de código 100. 
+-- 11. Mostrar el código de la factura y el número de línea de las facturas cuyas líneas superan 100 Bs sin 
+-- considerar descuentos ni impuestos. 
+-- 12. Importe medio por factura, sin considerar descuentos ni impuestos. El importe de una factura se 
+-- calcula sumando el producto de la can8dad por el precio de sus líneas. 
+-- 13. Stock medio, máximo, y mínimo de los arYculos que con8enen la letra A en la segunda posición 
+-- de su descripción y cuyo stock mínimo es superior a la mitad de su stock actual. 
+-- 14. Número de facturas para cada año. Junto con el año debe aparecer el número de facturas de ese 
+-- año. 
+-- 15. Número de facturas de cada cliente, pero sólo se deben mostrar aquellos clientes que 8enen más 
+-- de 15 facturas. 
+-- 16. Can8dades totales vendidas para cada arYculo cuyo código empieza por “F”. La can8dad total 
+-- vendida de un arYculo se calcula sumando las can8dades de todas sus líneas de factura. 
+-- 17. Código de aquellos arYculos de los que se ha facturado más de 6000 euros. 
+ 
+-- 18. Número de facturas de cada uno de los clientes cuyo código está entre 241 y 250, con cada IVA 
+-- dis8nto que se les ha aplicado. En cada línea del resultado se debe mostrar un código de cliente, 
+-- un IVA y el número de facturas de ese cliente con ese IVA. 
+-- 19. Vendedores y clientes cuyo nombre coincide (vendedores que a su vez han comprado algo a la 
+-- empresa) 
+ 
+-- 20. Creación de una vista que muestre únicamente los códigos postales de los clientes que inicien con 
+-- el número 12. 
+-- 21. Mostrar el código y el nombre de los clientes de Castellón (posee código 12) que han realizado 
+-- facturas con vendedores de más de dos provincias dis8ntas. El resultado debe quedar ordenado 
+-- ascendentemente respecto del nombre del cliente
