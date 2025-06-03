@@ -119,7 +119,7 @@ insert into facturas(id_cliente,id_producto,cantidad)values(2,2,20);
 /*Procedimiento para vender un producto, si no esta el cliente lo añadimos, el producto se vende por su nombre
  ("Robin", "Hood", "Iphone 27", 2(cantidad))
 si el cliente no esta lo añadimos, si el producto no esta lo advertimos
-la salida final será: nombre_cliente apellido_cliente nombre_producto cantidad precio importe(cantidad*precio)*/
+la salida final será: nombre_cliente apellido_cliente nombre_producto cantidad precio importe(cantidad*precio as total)*/
 DELIMITER $$
 create procedure venta_productos()
 DELIMITER ;
